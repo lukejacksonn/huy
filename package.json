@@ -1,0 +1,20 @@
+{
+  "name": "huy",
+  "version": "1.0.0",
+  "description": "Useful custom h function calls",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "hyperapp",
+    "view",
+    "function",
+    "h",
+  ],
+  "author": "Luke Jackson",
+  "license": "MIT",
+  "dependencies": {
+    "hyperapp": "^0.9.3"
+  }
+}
