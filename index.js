@@ -1,5 +1,8 @@
 import { h } from 'hyperapp'
 
+const noop = _ => _
+const debounced = time => fn => debounce(fn, time)
+
 const debounce = (func, wait, immediate) => {
   let timeout
   return function() {
@@ -12,14 +15,18 @@ const debounce = (func, wait, immediate) => {
     clearTimeout(timeout)
     timeout = setTimeout(later, wait)
     if (callNow) func.apply(context, args)
-  };
-};
+  }
+}
 
-const noop = _ => _
-const debounced = time => fn => debounce(fn, time)
-const use = href =>
+const onWindowBottom = fn => e =>
+  document.body.scrollTop > 0 &&
+  (window.innerHeight + window.scrollY) >= document.body.scrollHeight
+  ? fn(e)
+  : noop()
+
+export const use = href =>
   h('use', {
-    oncreate: e => e.setAttributeNS(
+    onupdate: e => e.setAttributeNS(
       'http://www.w3.org/1999/xlink',
       'href',
       href
@@ -33,7 +40,7 @@ export const link = a => (p={},c=[]) =>
   }), c)
 
 export const svg = (p={}) =>
-  h('svg', p, use(p.href))
+  h('svg', Object.assign({}, p, { href: '' }), use(p.href))
 
 export const img = (p={}) =>
   h('img', p)
@@ -45,3 +52,15 @@ export const input = (p={}) =>
   h('input', Object.assign(p, {
     oninput: debounced(p.debounce || 0)(p.action || noop)
   }))
+
+export const ul = (p={},c=[]) =>
+  h('ul', Object.assign(p, p.infinite ? {
+    oncreate: e => {
+      e._infinite = onWindowBottom(p.infinite || noop)
+      window.addEventListener('scroll', e._infinite)
+    },
+    onremove: (e,done) => {
+      window.removeEventListener('scroll', e._infinite)
+      done()
+    },
+  } : {}), c)
